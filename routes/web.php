@@ -18,12 +18,10 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-/**
-    Grupo de rotas com prefixo /api
- */
-$router->group(['prefix' => '/api'], function () use ($router) {
+$router->group(['prefix' => 'api'], function () use ($router) {
 
-    $router->get('/receita', 'MovimentController@index');
+    $router->post('receita', 'MovimentController@store');
+    $router->get('receita', 'MovimentController@index');
 
 });
 
