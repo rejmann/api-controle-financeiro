@@ -1,7 +1,5 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -13,6 +11,20 @@
 |
 */
 
+use Laravel\Lumen\Routing\Router;
+
+/** @var Router $router */
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+/**
+    Grupo de rotas com prefixo /api
+ */
+$router->group(['prefix' => '/api'], function () use ($router) {
+
+    $router->get('/receita', 'MovimentController@index');
+
+});
+
+
