@@ -62,4 +62,34 @@ class MovimentController extends Controller
         return response()->json(Moviment::find($id)->first(), 200);
     }
 
+    public function update(Request $request, int $id)
+    {
+        /**
+         * Busca a movimentação por id
+         */
+        $moviment = Moviment::find($id);
+
+        /**
+         * Valida se a movimentação existe
+         */
+        if(is_null($moviment)){
+            return response()->json(['error' => "Recurso não encontrado!"], 404);
+        }
+
+        /**
+         * Preenche os atributos da Model com os valores passados
+         */
+        $moviment->fill($request->all());
+
+        /**
+         * Salva mudanças
+         */
+        $moviment->save();
+
+        /**
+         * Retorna a movimentação atualizada em json
+         */
+        return response()->json($moviment, 200);
+    }
+
 }

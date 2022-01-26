@@ -26,6 +26,7 @@ $router->group(['prefix' => 'receitas'], function () use ($router) {
     $router->get('', 'MovimentController@index');
     $router->get('{id}', 'MovimentController@show');
     $router->post('', 'MovimentController@store');
+    $router->put('{id}', 'MovimentController@update');
 
 });
 
@@ -37,6 +38,7 @@ $router->group(['prefix' => 'despesas'], function () use ($router) {
     $router->get('', 'MovimentController@index');
     $router->get('{id}', 'MovimentController@show');
     $router->post('', 'MovimentController@store');
+    $router->put('{id}', 'MovimentController@update');
 
 });
 
