@@ -15,6 +15,11 @@ class Moviment extends Model
         'types_id',
     ];
 
+    protected $hidden = [
+        'id',
+        'types_id'
+    ];
+
     public function type()
     {
         return $this->belongsTo(Type::class)->first();

@@ -12,6 +12,10 @@ class Type extends Model
         'name'
     ];
 
+    protected $hidden = [
+        'id'
+    ];
+
     public function moviments()
     {
         return $this->hasMany(Moviment::class);
