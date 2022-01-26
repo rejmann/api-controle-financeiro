@@ -24,7 +24,7 @@ class MovimentController extends Controller
                 ->where('types_id', $type->id), 200);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Moviment $moviment)
     {
         /**
          * Recupera da URI os primeiros 7 caracteres que é referente ao tipo de movimentação
@@ -33,15 +33,17 @@ class MovimentController extends Controller
         $type = Type::where('name', substr($request->path(),0, 7))->first();
 
         /**
+         * Adicionado o id do tipo no request
+         */
+        $request->merge([
+            'types_id' => $type->id,
+        ]);
+
+        /**
          * Retorna o cadastro em json da movimentação criada
          */
-        return response()
-            ->json(Moviment::created([
-                'description' => $request->description,
-                'value' => $request->value,
-                'date' => $request->date,
-                'types_id' => $type->id,
-            ]), 200);
+        return response()->json($moviment->create($request->all(), 200));
+
     }
 
     public function show(Request $request, int $id)
