@@ -92,4 +92,12 @@ class MovimentController extends Controller
         return response()->json($moviment, 200);
     }
 
+    public function destroy(int $id)
+    {
+        if(Moviment::destroy($id) === 0){
+            return response()->json(['error' => "Recurso não encontrado!"], 404);
+        }
+        return response()->json('', 200);
+    }
+
 }
