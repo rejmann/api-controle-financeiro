@@ -21,16 +21,21 @@ $router->get('/', function () use ($router) {
 /**
  * Grupo de rotas para receitas
  */
-$router->group(['prefix' => '/receitas'], function () use ($router) {
+$router->group(['prefix' => 'receitas'], function () use ($router) {
 
     $router->get('', 'MovimentController@index');
+    $router->get('{id}', 'MovimentController@show');
     $router->post('', 'MovimentController@store');
 
 });
 
-$router->group(['prefix' => '/despesas'], function () use ($router) {
+/**
+ * Grupo de rotas para despesas
+ */
+$router->group(['prefix' => 'despesas'], function () use ($router) {
 
     $router->get('', 'MovimentController@index');
+    $router->get('{id}', 'MovimentController@show');
     $router->post('', 'MovimentController@store');
 
 });
