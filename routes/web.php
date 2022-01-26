@@ -18,10 +18,20 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->group(['prefix' => 'api'], function () use ($router) {
+/**
+ * Grupo de rotas para receitas
+ */
+$router->group(['prefix' => '/receitas'], function () use ($router) {
 
-    $router->post('receita', 'MovimentController@store');
-    $router->get('receita', 'MovimentController@index');
+    $router->get('', 'MovimentController@index');
+    $router->post('', 'MovimentController@store');
+
+});
+
+$router->group(['prefix' => '/despesas'], function () use ($router) {
+
+    $router->get('', 'MovimentController@index');
+    $router->post('', 'MovimentController@store');
 
 });
 
