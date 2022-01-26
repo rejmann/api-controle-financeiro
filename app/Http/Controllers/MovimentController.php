@@ -50,16 +50,27 @@ class MovimentController extends Controller
     public function show(Request $request, int $id)
     {
         /**
+         * Recupera da URI os primeiros 7 caracteres que é referente ao tipo de movimentação
+         * Busca o primeiro tipo
+         */
+        $type = Type::where('name', Support::formatPath($request))->first();
+
+        /**
+         * Busca a primeira movimentação por id/types_id
+         */
+        $data = Moviment::all()->where('id', $id)->where('types_id', $type->id)->first();
+
+        /**
          * Valida se a movimentação existe
          */
-        if(is_null(Moviment::find($id))){
-            return response('', 404);
+        if(!$data){
+            return response()->json(['error' => "Recurso não encontrado!"], 404);
         }
 
         /**
          * Retorna a busca em json da movimentação encontrada
          */
-        return response()->json(Moviment::find($id)->first(), 200);
+        return response()->json($data, 200);
     }
 
     public function update(Request $request, int $id)
