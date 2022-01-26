@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class SupportController extends Controller
 {
-    public static function subStrPath(Request $request): string
+    public static function formatPath(Request $request): string
     {
         return substr($request->path(),0, 7);
     }

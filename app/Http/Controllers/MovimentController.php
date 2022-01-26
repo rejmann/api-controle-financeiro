@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Moviment;
 use App\Models\Type;
 use Illuminate\Http\Request;
+use App\Http\Controllers\SupportController as Support;
 
 class MovimentController extends Controller
 {
@@ -14,7 +15,7 @@ class MovimentController extends Controller
          * Recupera da URI os primeiros 7 caracteres que é referente ao tipo de movimentação
          * Busca o primeiro tipo
          */
-        $type = Type::where('name', substr($request->path(),0, 7))->first();
+        $type = Type::where('name', Support::formatPath($request))->first();
 
         /**
          * Returna todos as movimentações em formato json do tipo atribuído na URI da rota
@@ -30,7 +31,7 @@ class MovimentController extends Controller
          * Recupera da URI os primeiros 7 caracteres que é referente ao tipo de movimentação
          * Busca o primeiro tipo
          */
-        $type = Type::where('name', substr($request->path(),0, 7))->first();
+        $type = Type::where('name', Support::formatPath($request))->first();
 
         /**
          * Adicionado o id do tipo no request
@@ -49,27 +50,16 @@ class MovimentController extends Controller
     public function show(Request $request, int $id)
     {
         /**
-         * Recupera da URI os primeiros 7 caracteres que é referente ao tipo de movimentação
-         * Busca o primeiro tipo
-         */
-        $type = Type::where('name', substr($request->path(),0, 7))->first();
-
-        /**
-         * Busca a primeira movimentação por id/types_id
-         */
-        $data = Moviment::all()->where('id', $id)->where('types_id', $type->id)->first();
-
-        /**
          * Valida se a movimentação existe
          */
-        if(!$data){
-            return response()->json(['no_exist' => 'Não foi encontrado movimentação para este id.']);
+        if(is_null(Moviment::find($id))){
+            return response('', 404);
         }
 
         /**
          * Retorna a busca em json da movimentação encontrada
          */
-        return response()->json($data, 200);
+        return response()->json(Moviment::find($id)->first(), 200);
     }
 
 }
