@@ -28,6 +28,25 @@ class MovimentController extends Controller
     public function store(Request $request)
     {
         /**
+         * Validando recursos
+         */
+        $this->validate(
+            $request,
+            [
+                'description' => 'required|string|max:255',
+                'value' => 'required',
+                'date' => 'required|date'
+            ],
+            [
+                'description.require' => 'O recurso description é obrigatório',
+                'description.string' => 'O recurso description esperado deve ser do tipo string',
+                'description.max' => 'O recurso description esperado deve conter no máximo 255 caracteres',
+                'value.require' => 'O recurso value é obrigatório',
+                'date.require' => 'O recurso date é obrigatório',
+            ]
+        );
+
+        /**
          * Recupera da URI os primeiros 7 caracteres que é referente ao tipo de movimentação
          * Busca o primeiro tipo
          */

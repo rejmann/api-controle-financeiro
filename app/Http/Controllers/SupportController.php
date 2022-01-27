@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Moviment;
 use Illuminate\Http\Request;
 
 class SupportController extends Controller
@@ -38,7 +37,6 @@ class SupportController extends Controller
                 return true;
             }
         }
+        return false;
     }
-
-
 }
