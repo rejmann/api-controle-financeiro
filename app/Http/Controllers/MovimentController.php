@@ -18,14 +18,14 @@ class MovimentController extends Controller
         $type = Type::where('name', Support::formatPath($request))->first();
 
         /**
-         * Returna todos as movimentações em formato json do tipo atribuído na URI da rota
+         * Retorna todos as movimentações em formato json do tipo atribuído na URI da rota
          */
         return response()
             ->json(Moviment::all()
                 ->where('types_id', $type->id), 200);
     }
 
-    public function store(Request $request, Moviment $moviment)
+    public function store(Request $request)
     {
         /**
          * Recupera da URI os primeiros 7 caracteres que é referente ao tipo de movimentação
@@ -41,9 +41,26 @@ class MovimentController extends Controller
         ]);
 
         /**
+         * Busca todas as movimentações do mês da data informada, igual a descrição e tipo.
+         */
+        $moviments = Moviment::all()->whereBetween('date', [
+                    date('Y-m-01', strtotime($request->date)),
+                    date('Y-m-t', strtotime($request->date))
+            ])
+            ->where('description', $request->description)
+            ->where('types_id', $type->id);
+
+        /**
+         * Valida de a movimentação já foi cadastrada para o mês informado.
+         */
+        if(!empty($moviments->all() && Support::validateMoviment($request->date, $moviments))){
+            return response()->json(['error' => "Recurso já cadastrado para o mês informado!"], 404);
+        }
+
+        /**
          * Retorna o cadastro em json da movimentação criada
          */
-        return response()->json($moviment->create($request->all(), 200));
+        return response()->json(Moviment::create($request->all(), 200));
 
     }
 
