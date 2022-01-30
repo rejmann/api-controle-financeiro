@@ -16,7 +16,7 @@ class MovimentController extends Controller
     public function index(Request $request)
     {
         // Busca tipo a partir o path passado.
-        $type = Type::where('name', $request->path())->first();
+        $type = Type::where('name', Support::formatPath($request))->first();
 
         // Retorna todos as movimentações em formato json do tipo atribuído na URI da rota
         return response()
@@ -35,7 +35,7 @@ class MovimentController extends Controller
         (new Support())->validateRequiredResources($request);
 
         // Busca tipo a partir o path passado.
-        $type = Type::where('name', $request->path())->first();
+        $type = Type::where('name', Support::formatPath($request))->first();
 
         // Adiciona o id do tipo no request
         $request->merge([
@@ -69,7 +69,7 @@ class MovimentController extends Controller
     public function show(Request $request, int $id)
     {
         // Busca tipo a partir o path passado.
-        $type = Type::where('name', $request->path())->first();
+        $type = Type::where('name', Support::formatPath($request))->first();
 
         // Busca a primeira movimentação por id/types_id.
         $data = Moviment::all()

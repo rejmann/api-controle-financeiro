@@ -3,10 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class SupportController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return string
+     */
+    public static function formatPath(Request $request): string
+    {
+        return substr($request->path(),0, 8);
+    }
+
     /**
      * @param string $requestDate
      * @param string $modelDate
