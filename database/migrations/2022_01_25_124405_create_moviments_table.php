@@ -23,6 +23,11 @@ class CreateMovimentsTable extends Migration
             $table->foreign('types_id')
                 ->references('id')
                 ->on('types');
+
+            $table->unsignedBigInteger('categories_id')->nullable();
+            $table->foreign('categories_id')
+                ->references('id')
+                ->on('categories');
         });
     }
 
