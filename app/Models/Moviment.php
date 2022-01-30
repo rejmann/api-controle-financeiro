@@ -19,6 +19,7 @@ class Moviment extends Model
         'value',
         'date',
         'types_id',
+        'categories_id'
     ];
 
     /**
@@ -26,7 +27,8 @@ class Moviment extends Model
      */
     protected $hidden = [
         'id',
-        'types_id'
+        'types_id',
+        'categories_id'
     ];
 
     /**
@@ -35,5 +37,13 @@ class Moviment extends Model
     public function type()
     {
         return $this->belongsTo(Type::class)->first();
+    }
+
+    /**
+     * @return Model|\Illuminate\Database\Eloquent\Relations\BelongsTo|object|null
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class)->first();
     }
 }
