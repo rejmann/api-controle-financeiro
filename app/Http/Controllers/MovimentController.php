@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Moviment;
 use App\Models\Type;
 use Illuminate\Http\Request;
@@ -56,6 +57,16 @@ class MovimentController extends Controller
         $request->merge([
             'types_id' => $type->id,
         ]);
+
+        if(Support::formatPath($request) === 'despesas'){
+
+            $category = !is_null($request->category) ? Category::where('name', $request->category)->first()
+                                                     : Category::where('name', 'Outros')->first();
+
+            $request->merge([
+                'categories_id' => $category->id,
+            ]);
+        }
 
         // Busca todas as movimentações do mês da data informada, igual a descrição e tipo.
         $moviments = Moviment::all()->whereBetween('date', [
