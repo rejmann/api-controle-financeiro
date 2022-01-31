@@ -102,6 +102,35 @@ class MovimentController extends Controller
             ->json($data, 200);
     }
 
+    /**
+     * @param Request $request
+     * @param int $year
+     * @param int $month
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showByMonth(Request $request, int $year, int $month)
+    {
+        // Busca tipo a partir o path passado.
+        $type = Type::where('name', Support::formatPath($request))->first();
+
+        // Busca todas as movimentações do mês da data informada, igual a descrição e tipo.
+        $moviments = Moviment::all()->whereBetween('date', [
+                date('Y-m-01', strtotime("$year-$month")),
+                date('Y-m-t', strtotime("$year-$month"))])
+            ->where('types_id', $type->id);
+
+        // Verifica se existe movimentações
+        if (empty($moviments->all())){
+            // Retorna a movimentação atualizada em json.
+            return response()
+                ->json('',204);
+        }
+
+        // Retorna a movimentação atualizada em json.
+        return response()
+            ->json($moviments);
+    }
+
     public function update(Request $request, int $id)
     {
         // Validando recursos.
