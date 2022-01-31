@@ -18,6 +18,21 @@ class MovimentController extends Controller
         // Busca tipo a partir o path passado.
         $type = Type::where('name', Support::formatPath($request))->first();
 
+        if ($request->descricao){
+
+            $moviments = Moviment::where('description', 'like', "%{$request->descricao}%")
+                ->where('types_id', $type->id)
+                ->get();
+
+            if(empty($moviments->all())){
+                return response()
+                    ->json('', 204);
+            }
+
+            return response()
+                ->json($moviments->all());
+        }
+
         // Retorna todos as movimentações em formato json do tipo atribuído na URI da rota
         return response()
             ->json(Moviment::all()
@@ -53,7 +68,7 @@ class MovimentController extends Controller
         // Valida de a movimentação já foi cadastrada para o mês informado.
         if (!empty($moviments->all() && Support::validateMoviment($request->date, $moviments))) {
             return response()
-                ->json(['error' => "Recurso já cadastrado para o mês informado!"], 204);
+                ->json('', 204);
         }
 
         // Retorna o cadastro em json da movimentação criada.
@@ -79,7 +94,7 @@ class MovimentController extends Controller
         // Valida se a movimentação existe.
         if (!$data) {
             return response()
-                ->json(['error' => "Recurso não encontrado!"], 404);
+                ->json('', 404);
         }
 
         // Retorna a busca em json da movimentação encontrada.
@@ -98,7 +113,7 @@ class MovimentController extends Controller
         // Valida se a movimentação existe.
         if (is_null($moviment)) {
             return response()
-                ->json(['error' => "Recurso não encontrado!"], 404);
+                ->json('', 404);
         }
 
         // Preenche os atributos da Model com os valores passados.
@@ -119,7 +134,7 @@ class MovimentController extends Controller
     {
         if (!Moviment::destroy($id)) {
             return response()
-                ->json(['error' => "Recurso não encontrado!"], 404);
+                ->json('', 404);
         }
         return response()
             ->json('', 204);
