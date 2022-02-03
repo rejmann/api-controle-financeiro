@@ -47,12 +47,11 @@ $router->group(['prefix' => 'despesas'], function () use ($router) {
 });
 
 /**
- * Grupo de rotas para resumo
+ * Rota para resumo
  */
-$router->group(['prefix' => 'resumo'], function () use ($router) {
+$router->get('resumo/{year}/{month}', 'ResumeController@showByMonth');
 
-    $router->get('{year}/{month}', 'ResumeController@showByMonth');
 
-});
+
 
 
