@@ -59,4 +59,10 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
 /**
  * Rota para login
  */
-$router->post('login', 'TokenController@createToken');
+$router->post('login', 'UserController@tokenGenerator');
+
+/**
+ * Rota para cadastrar
+ */
+$router->post('cadastrar', 'UserController@store');
+
