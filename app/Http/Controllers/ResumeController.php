@@ -121,13 +121,6 @@ class ResumeController extends Controller
             }
         }
 
-        // Faz um unset nas categorias que tem seu valor zerado
-        foreach ($date as $key => $value){
-            if(!$value){
-                unset($date[$key]);
-            }
-        }
-
         return $date;
     }
 }
