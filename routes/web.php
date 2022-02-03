@@ -55,3 +55,8 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
      */
     $router->get('resumo/{year}/{month}', 'ResumeController@showByMonth');
 });
+
+/**
+ * Rota para login
+ */
+$router->post('login', 'TokenController@createToken');
