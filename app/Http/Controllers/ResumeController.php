@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\Moviment;
 use App\Models\Type;
 use Illuminate\Http\Request;
-use App\Http\Controllers\SupportController as Support;
 
 class ResumeController extends Controller
 {
@@ -22,13 +21,19 @@ class ResumeController extends Controller
             'receitas' => $this->totalResumeByType('receitas', $year, $month),
             'despesas' => $this->totalResumeByType('despesas', $year, $month),
             'saldo' => $this->getMovimentsByType('receitas', $year, $month) - $this->getMovimentsByType('despesas', $year, $month),
-            'gastos' => $this->createArrayCategory('despesas', $year, $month),
+            'gastos' => $this->createArrayCategory($year, $month),
         ];
 
         return response()
             ->json($resume, 404);
     }
 
+    /**
+     * @param string $nameType
+     * @param int $year
+     * @param int $month
+     * @return int|mixed
+     */
     public function totalResumeByType(string $nameType, int $year, int $month)
     {
         // Busca tipo a partir o path passado.
@@ -49,6 +54,12 @@ class ResumeController extends Controller
         return $sum;
     }
 
+    /**
+     * @param string $nameType
+     * @param int $year
+     * @param int $month
+     * @return int
+     */
     public function getMovimentsByType(string $nameType, int $year, int $month)
     {
         // Busca tipo a partir o path passado.
@@ -67,7 +78,12 @@ class ResumeController extends Controller
         return $sum;
     }
 
-    public function createArrayCategory(string $nameType, int $year, int $month)
+    /**
+     * @param int $year
+     * @param int $month
+     * @return int[]|string[]
+     */
+    public function createArrayCategory(int $year, int $month)
     {
         $date = [];
 
