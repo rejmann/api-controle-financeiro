@@ -6,37 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateMovimentsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('moviments', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('description');
-            $table->double('value');
+            $table->integer('value');
             $table->date('date');
+            $table->timestamps();
 
-            $table->unsignedBigInteger('types_id');
-            $table->foreign('types_id')
-                ->references('id')
-                ->on('types');
-
-            $table->unsignedBigInteger('categories_id')->nullable();
-            $table->foreign('categories_id')
-                ->references('id')
-                ->on('categories');
+            $table->foreignId('types_id')->constrained();
+            $table->foreignId('category_id')->constrained();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('moviments');
     }

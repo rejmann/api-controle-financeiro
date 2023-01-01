@@ -2,24 +2,16 @@
 
 namespace Database\Seeders;
 
+use App\Models\Type;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class TypeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
-        DB::table('types')->insert([
-            'name' => 'Receitas'
-        ]);
-
-        DB::table('types')->insert([
-            'name' => 'Despesas'
-        ]);
+        collect(['receitas', 'despesas'])
+            ->each(
+                fn (string $type) => Type::query()->create(['name' => $type])
+            );
     }
 }
