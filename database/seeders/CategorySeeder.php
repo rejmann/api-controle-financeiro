@@ -2,11 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
+    public function __construct(
+        private readonly CategoryRepository $categoryRepository
+    ) {
+    }
+
     public function run(): void
     {
         $categories = collect([
@@ -21,7 +26,7 @@ class CategorySeeder extends Seeder
         ]);
 
         $categories->each(function (string $categories) {
-            Category::query()->create([
+            $this->categoryRepository->create([
                 'name' => $categories
             ]);
         });

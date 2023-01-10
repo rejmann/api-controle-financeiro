@@ -16,7 +16,7 @@ class CreateMovimentsTable extends Migration
             $table->timestamps();
 
             $table->foreignId('types_id')->constrained();
-            $table->foreignId('category_id')->constrained();
+            $table->foreignId('categories_id')->nullable()->constrained();
         });
     }
 

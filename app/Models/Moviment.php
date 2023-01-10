@@ -19,7 +19,6 @@ class Moviment extends Model
     ];
 
     protected $hidden = [
-        'id',
         'types_id',
         'categories_id'
     ];
