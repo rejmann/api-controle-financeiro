@@ -10,6 +10,9 @@ class Type extends Model
 {
     use HasFactory;
 
+    public const REVENUE = 'receitas';
+    public const EXPENSE = 'despesas';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -25,4 +28,13 @@ class Type extends Model
         return $this->hasMany(Moviment::class);
     }
 
+    public static function isRevenue(string $type): bool
+    {
+        return Type::REVENUE === $type;
+    }
+
+    public static function isExpense(string $type): bool
+    {
+        return Type::EXPENSE === $type;
+    }
 }

@@ -2,182 +2,204 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Moviment;
+use App\DTO\MovimentFilterDTO;
+use App\Http\Requests\MovimentStoreRequest;
+use App\Http\Requests\MovimentUpdateRequest;
 use App\Models\Type;
+use App\Services\MovimentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\SupportController as Support;
+use Symfony\Component\HttpFoundation\Response;
 
 class MovimentController extends Controller
 {
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index(Request $request)
-    {
-        // Busca tipo a partir o path passado.
-        $type = Type::where('name', Support::formatPath($request))->first();
-
-        if ($request->descricao){
-
-            $moviments = Moviment::where('description', 'like', "%{$request->descricao}%")
-                ->where('types_id', $type->id)
-                ->get();
-
-            if(empty($moviments->all())){
-                return response()
-                    ->json('', 204);
-            }
-
-            return response()
-                ->json($moviments->all());
-        }
-
-        // Retorna todos as movimentações em formato json do tipo atribuído na URI da rota
-        return response()
-            ->json(Moviment::all()
-                ->where('types_id', $type->id));
+    public function __construct(
+        private readonly MovimentService $movimentService,
+    ) {
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function store(Request $request)
+    public function indexRevenueAction(Request $request): JsonResponse
     {
-        // Validando recursos.
-        (new Support())->validateRequiredResources($request);
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setDescription($request->json()->get('description'))
+            ->setType(Type::REVENUE);
 
-        // Busca tipo a partir o path passado.
-        $type = Type::where('name', Support::formatPath($request))->first();
+        $moviments = $this->movimentService->search($movimentFilterDto);
 
-        // Adiciona o id do tipo no request
-        $request->merge([
-            'types_id' => $type->id,
-        ]);
-
-        if(Support::formatPath($request) === 'despesas'){
-
-            $category = !is_null($request->category) ? Category::where('name', $request->category)->first()
-                                                     : Category::where('name', 'Outros')->first();
-
-            $request->merge([
-                'categories_id' => $category->id,
-            ]);
-        }
-
-        // Busca todas as movimentações do mês da data informada, igual a descrição e tipo.
-        $moviments = Moviment::all()->whereBetween('date', [
-            date('Y-m-01', strtotime($request->date)),
-            date('Y-m-t', strtotime($request->date))
-        ])
-            ->where('description', $request->description)
-            ->where('types_id', $type->id);
-
-        // Valida de a movimentação já foi cadastrada para o mês informado.
-        if (!empty($moviments->all() && Support::validateMoviment($request->date, $moviments))) {
-            return response()
-                ->json('', 204);
-        }
-
-        // Retorna o cadastro em json da movimentação criada.
-        return response()->json(Moviment::create($request->all(), 200));
-
+        return empty($moviments)
+            ? response()->json('', Response::HTTP_NO_CONTENT)
+            : response()->json($moviments, Response::HTTP_OK);
     }
 
-    /**
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show(Request $request, int $id)
+    public function indexExpenseAction(Request $request): JsonResponse
     {
-        // Busca tipo a partir o path passado.
-        $type = Type::where('name', Support::formatPath($request))->first();
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setDescription($request->json()->get('description'))
+            ->setType(Type::EXPENSE);
 
-        // Busca a primeira movimentação por id/types_id.
-        $data = Moviment::all()
-            ->where('id', $id)
-            ->where('types_id', $type->id)->first();
+        $moviments = $this->movimentService->search($movimentFilterDto);
 
-        // Valida se a movimentação existe.
-        if (!$data) {
-            return response()
-                ->json('', 404);
-        }
-
-        // Retorna a busca em json da movimentação encontrada.
-        return response()
-            ->json($data, 200);
+        return empty($moviments)
+            ? response()->json('', Response::HTTP_NO_CONTENT)
+            : response()->json($moviments, Response::HTTP_OK);
     }
 
-    /**
-     * @param Request $request
-     * @param int $year
-     * @param int $month
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function showByMonth(Request $request, int $year, int $month)
+    public function showRevenueAction(int $id): JsonResponse
     {
-        // Busca tipo a partir o path passado.
-        $type = Type::where('name', Support::formatPath($request))->first();
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setId($id)
+            ->setType(Type::REVENUE);
 
-        // Busca todas as movimentações do mês da data informada, igual a descrição e tipo.
-        $moviments = Moviment::all()->whereBetween('date', [
-                date('Y-m-01', strtotime("$year-$month")),
-                date('Y-m-t', strtotime("$year-$month"))])
-            ->where('types_id', $type->id);
+        $moviment = $this->movimentService->search($movimentFilterDto);
 
-        // Verifica se existe movimentações
-        if (empty($moviments->all())){
-            // Retorna a movimentação atualizada em json.
-            return response()
-                ->json('',204);
-        }
-
-        // Retorna a movimentação atualizada em json.
-        return response()
-            ->json($moviments);
+        return $moviment
+            ? response()->json($moviment, Response::HTTP_OK)
+            : response()->json('', Response::HTTP_NO_CONTENT);
     }
 
-    public function update(Request $request, int $id)
+    public function showExpenseAction(int $id): JsonResponse
     {
-        // Validando recursos.
-        (new Support())->validateRequiredResources($request);
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setId($id)
+            ->setType(Type::REVENUE);
 
-        // Busca a movimentação por id.
-        $moviment = Moviment::find($id);
+        $moviment = $this->movimentService->search($movimentFilterDto);
 
-        // Valida se a movimentação existe.
-        if (is_null($moviment)) {
-            return response()
-                ->json('', 404);
-        }
-
-        // Preenche os atributos da Model com os valores passados.
-        $moviment->fill($request->all());
-
-        // Salva mudanças.
-        $moviment->save();
-
-        // Retorna a movimentação atualizada em json.
-        return response()->json($moviment);
+        return $moviment
+            ? response()->json($moviment, Response::HTTP_OK)
+            : response()->json('', Response::HTTP_NO_CONTENT);
     }
 
-    /**
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(int $id)
+    public function storeRevenueAction(MovimentStoreRequest $request): JsonResponse
     {
-        if (!Moviment::destroy($id)) {
-            return response()
-                ->json('', 404);
+        $validated = $request->validate();
+
+        if (! $validated->isValid()) {
+            return response()->json($validated->erros(), Response::HTTP_BAD_REQUEST);
         }
-        return response()
-            ->json('', 204);
+
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setDescription($request->json()->get('description'))
+            ->setValue($request->json()->get('value'))
+            ->setDate($request->json()->get('date'))
+            ->setType(Type::REVENUE)
+            ->setCategory($request->json()->get('category'));
+
+        $created = $this->movimentService->create($movimentFilterDto);
+
+        return $created
+            ? response()->json($created, Response::HTTP_CREATED)
+            : response()->json(
+                [
+                    'error' => 'Movimentação já cadastrada para o mês em vigência'
+                ],
+                Response::HTTP_BAD_REQUEST
+            );
     }
 
+    public function storeExpenseAction(MovimentStoreRequest $request): JsonResponse
+    {
+        $validated = $request->validate();
+
+        if (! $validated->isValid()) {
+            return response()->json($validated->erros(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setDescription($request->json()->get('description'))
+            ->setValue($request->json()->get('value'))
+            ->setDate($request->json()->get('date'))
+            ->setType(Type::EXPENSE)
+            ->setCategory($request->json()->get('category'));
+
+        $created = $this->movimentService->create($movimentFilterDto);
+
+        return $created
+            ? response()->json($created, Response::HTTP_CREATED)
+            : response()->json(
+                [
+                    'error' => 'Movimentação já cadastrada para o mês em vigência'
+                ],
+                Response::HTTP_BAD_REQUEST
+            );
+    }
+
+    public function showRevenueByMonth(int $year, int $month): JsonResponse
+    {
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setType(Type::REVENUE)
+            ->setDate("01/$month/$year");
+
+        $moviments = $this->movimentService->search($movimentFilterDto);
+
+        return $moviments
+            ? response()->json($moviments, Response::HTTP_OK)
+            : response()->json('', Response::HTTP_NO_CONTENT);
+    }
+
+    public function showExpenseByMonth(int $year, int $month): JsonResponse
+    {
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setType(Type::EXPENSE)
+            ->setDate("01/$month/$year");
+
+        $moviments = $this->movimentService->search($movimentFilterDto);
+
+        return $moviments
+            ? response()->json($moviments, Response::HTTP_OK)
+            : response()->json('', Response::HTTP_NO_CONTENT);
+    }
+
+    public function updateRevenueAction(MovimentUpdateRequest $request, int $id): JsonResponse
+    {
+        $validated = $request->validate();
+
+        if (! $validated->isValid()) {
+            return response()->json($validated->erros(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setId($id)
+            ->setDescription($request->json()->get('description'))
+            ->setValue($request->json()->get('value'))
+            ->setDate($request->json()->get('date'))
+            ->setType(Type::REVENUE)
+            ->setCategory($request->json()->get('category'));
+
+        $updated =  $this->movimentService->update($movimentFilterDto)->toArray();
+
+        return ! $updated
+            ? response()->json('', Response::HTTP_NOT_FOUND)
+            : response()->json($updated, Response::HTTP_ACCEPTED);
+    }
+
+    public function updateExpenseAction(MovimentUpdateRequest $request, int $id): JsonResponse
+    {
+        $validated = $request->validate();
+
+        if (! $validated->isValid()) {
+            return response()->json($validated->erros(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $movimentFilterDto = (new MovimentFilterDTO())
+            ->setId($id)
+            ->setDescription($request->json()->get('description'))
+            ->setValue($request->json()->get('value'))
+            ->setDate($request->json()->get('date'))
+            ->setType(Type::REVENUE)
+            ->setCategory($request->json()->get('category'));
+
+        $updated =  $this->movimentService->update($movimentFilterDto)->toArray();
+
+        return ! $updated
+            ? response()->json('', Response::HTTP_NOT_FOUND)
+            : response()->json($updated, Response::HTTP_ACCEPTED);
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        return $this->movimentService->delete($id)
+            ? response()->json('', Response::HTTP_OK)
+            : response()->json('', Response::HTTP_NOT_FOUND);
+    }
 }

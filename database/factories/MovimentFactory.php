@@ -13,17 +13,19 @@ class MovimentFactory extends Factory
         return [
             'description' => $this->faker->text(20),
             'value' => $this->faker->numberBetween(1, 999),
-            'date' => $this->dateRandom(
-                $this->faker->numberBetween(1, 2),
-                $this->faker->numberBetween(1, 3),
-                $this->faker->numberBetween(1, 31)
-            ),
+            'date' => $this->dateRandom(),
             'types_id' => Type::all()->random()->id
         ];
     }
 
-    private function dateRandom(int $rangeYear, int $rangeMonth, int $rangeDay): string
+    private function dateRandom(): string
     {
-        return (new DateTime())->setDate($rangeYear, $rangeMonth, $rangeDay)->format('Y-m-d');
+        $date = new DateTime();
+        $date->setDate(
+            $this->faker->numberBetween((int)$date->format('Y'), (int)$date->format('Y') + 1),
+            $this->faker->numberBetween(1, 12),
+            $this->faker->numberBetween(1, (int)$date->format('t'))
+        );
+        return $date->format('Y-m-d');
     }
 }
