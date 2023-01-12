@@ -130,7 +130,7 @@ Criar as tabelas e populando o banco de dados:
 #### Atualizar Receitas ou Despesas:
 
 ```http
-  PUT /receitas/{$id} | GET /despesas/{$id} 
+  PUT /receitas/{$id} | PUT /despesas/{$id} 
 ```
 ```json
 {
@@ -148,5 +148,5 @@ Criar as tabelas e populando o banco de dados:
 #### Excluindo Receitas ou Despesas:
 
 ```http
-  DELETE /receitas/{$id} | GET /despesas/{$id} 
+  DELETE /receitas/{$id} | DELETE /despesas/{$id} 
 ```
