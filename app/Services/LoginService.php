@@ -23,7 +23,10 @@ class LoginService
         }
 
         return $this->tokenService->generate(
-            ['email' => $email],
+            [
+                'email' => $email,
+                'exp'   => (new \DateTime('+1 hour'))->getTimestamp(),
+            ],
             env('JWT_KEY')
         );
     }
